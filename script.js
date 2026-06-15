@@ -78,6 +78,73 @@ class OrbitAI {
         this.scrollToBottom();
     }
     
+    /**
+     * Парсит текст и находит все ссылки в формате [текст](ссылка)
+     * @param {string} text - текст с потенциальными ссылками
+     * @returns {Array} массив с текстом и объектами ссылок
+     */
+    parseLinks(text) {
+        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        const parts = [];
+        let lastIndex = 0;
+        let match;
+        
+        while ((match = linkRegex.exec(text)) !== null) {
+            // Добавляем текст перед ссылкой
+            if (match.index > lastIndex) {
+                parts.push({
+                    type: 'text',
+                    content: text.substring(lastIndex, match.index)
+                });
+            }
+            
+            // Добавляем саму ссылку
+            parts.push({
+                type: 'link',
+                text: match[1],
+                url: match[2]
+            });
+            
+            lastIndex = match.index + match[0].length;
+        }
+        
+        // Добавляем оставшийся текст
+        if (lastIndex < text.length) {
+            parts.push({
+                type: 'text',
+                content: text.substring(lastIndex)
+            });
+        }
+        
+        return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+    }
+    
+    /**
+     * Создаёт HTML элемент с поддержкой ссылок
+     * @param {string} text - текст с возможными ссылками
+     * @returns {HTMLElement} элемент с ссылками
+     */
+    createTextWithLinks(text) {
+        const container = document.createElement('div');
+        const parts = this.parseLinks(text);
+        
+        parts.forEach(part => {
+            if (part.type === 'text') {
+                container.appendChild(document.createTextNode(part.content));
+            } else if (part.type === 'link') {
+                const link = document.createElement('a');
+                link.href = part.url;
+                link.textContent = part.text;
+                link.className = 'message-link';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                container.appendChild(link);
+            }
+        });
+        
+        return container;
+    }
+    
     simulateAIResponse(key) {
         this.currentDialog = key;
         this.isWaitingForResponse = true;
@@ -122,18 +189,50 @@ class OrbitAI {
         
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
-        bubble.textContent = '';
+        bubble.innerHTML = '';
         
         messageDiv.appendChild(bubble);
         this.messagesContainer.appendChild(messageDiv);
         this.scrollToBottom();
         
-        let index = 0;
+        // Парсим текст чтобы найти ссылки
+        const parts = this.parseLinks(text);
+        let currentPartIndex = 0;
+        let currentCharIndex = 0;
+        let totalChars = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1').length;
+        let displayedChars = 0;
+        
         const typeInterval = setInterval(() => {
-            if (index < text.length) {
-                bubble.textContent += text[index];
-                index++;
-                this.scrollToBottom();
+            if (currentPartIndex < parts.length) {
+                const part = parts[currentPartIndex];
+                
+                if (part.type === 'text') {
+                    if (currentCharIndex < part.content.length) {
+                        bubble.textContent += part.content[currentCharIndex];
+                        currentCharIndex++;
+                        displayedChars++;
+                        this.scrollToBottom();
+                    } else {
+                        currentPartIndex++;
+                        currentCharIndex = 0;
+                    }
+                } else if (part.type === 'link') {
+                    // Для ссылок добавляем весь текст сразу
+                    if (currentCharIndex === 0) {
+                        const link = document.createElement('a');
+                        link.href = part.url;
+                        link.textContent = part.text;
+                        link.className = 'message-link';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        bubble.appendChild(link);
+                        
+                        currentPartIndex++;
+                        currentCharIndex = 0;
+                        displayedChars += part.text.length;
+                        this.scrollToBottom();
+                    }
+                }
             } else {
                 clearInterval(typeInterval);
             }
