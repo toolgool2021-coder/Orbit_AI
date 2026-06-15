@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Главный экран -->
+        <div id="welcome-screen" class="welcome-screen">
+            <div class="orbit-container">
+                <div class="brain-wrapper">
+                    <img src="assets/brain.png" alt="Orbit AI Brain" class="brain-image">
+                </div>
+                <h1 class="orbit-title">Orbit AI</h1>
+            </div>
+            <button id="action-panel" class="action-panel" aria-label="Start chat">
+                <span class="action-text">Начните разговор</span>
+                <span class="action-icon">→</span>
+            </button>
+        </div>
+
+        <!-- Экран чата -->
+        <div id="chat-screen" class="chat-screen hidden">
+            <div class="chat-container">
+                <div id="messages-container" class="messages-container"></div>
+            </div>
+            <div class="chat-input-panel">
+                <button id="back-button" class="back-button" aria-label="Back">
+                    <span>← Назад</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Модальное окно с вопросами -->
+        <div id="modal-overlay" class="modal-overlay hidden"></div>
+        <div id="modal-panel" class="modal-panel hidden">
+            <div class="modal-header">
+                <h2>Быстрые вопросы</h2>
+                <button id="close-modal" class="close-modal" aria-label="Close">✕</button>
+            </div>
+            <div id="questions-container" class="questions-container"></div>
+        </div>
+    </div>
+
+    <script src="responses.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
