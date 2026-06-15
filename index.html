@@ -8,6 +8,9 @@
 </head>
 <body>
     <div id="app">
+        <!-- Particles background -->
+        <div id="particles-container" class="particles-container"></div>
+
         <!-- Главный экран -->
         <div id="welcome-screen" class="welcome-screen">
             <div class="orbit-container">
@@ -24,13 +27,15 @@
 
         <!-- Экран чата -->
         <div id="chat-screen" class="chat-screen hidden">
+            <div class="chat-header">
+                <h2 class="chat-title">Orbit AI</h2>
+                <button id="back-button" class="back-button" aria-label="Back to menu">
+                    <span class="back-icon">✕</span>
+                    <span class="back-text">Выход</span>
+                </button>
+            </div>
             <div class="chat-container">
                 <div id="messages-container" class="messages-container"></div>
-            </div>
-            <div class="chat-input-panel">
-                <button id="back-button" class="back-button" aria-label="Back">
-                    <span>← Назад</span>
-                </button>
             </div>
         </div>
 
