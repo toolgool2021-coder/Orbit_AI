@@ -13,6 +13,8 @@ class OrbitAI {
         this.questionsContainer = document.getElementById('questions-container');
         this.closeModal = document.getElementById('close-modal');
         this.backButton = document.getElementById('back-button');
+        // New: кнопка выхода в главное меню из модального окна
+        this.exitToMain = document.getElementById('exit-to-main');
         
         this.initializeEventListeners();
     }
@@ -22,6 +24,9 @@ class OrbitAI {
         this.closeModal.addEventListener('click', () => this.closeModalPanel());
         this.modalOverlay.addEventListener('click', () => this.closeModalPanel());
         this.backButton.addEventListener('click', () => this.goBack());
+        if (this.exitToMain) {
+            this.exitToMain.addEventListener('click', () => this.goBack());
+        }
     }
     
     openModal() {
@@ -53,6 +58,13 @@ class OrbitAI {
     
     selectOption(text, key) {
         this.closeModalPanel();
+        // If the option points to the main dialog, treat it as "exit to main menu"
+        if (key === 'main') {
+            // If chat isn't started yet, just ensure welcome screen is visible
+            // Otherwise, go back to main (clears chat and shows welcome)
+            this.goBack();
+            return;
+        }
         this.startChat();
         this.addUserMessage(text);
         this.simulateAIResponse(key);
